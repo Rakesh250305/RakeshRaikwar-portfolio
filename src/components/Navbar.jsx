@@ -38,7 +38,7 @@ export default function Navbar() {
 
         {/* Admin Button */}
         <NavLink
-          to="/admin/login"
+          to="/admin-login"
           className="hidden md:inline-block px-2 py-2 text-sm text-white transition"
         >
           <FaUserShield size={20}/>
@@ -68,7 +68,7 @@ export default function Navbar() {
               </a>
             ))}
             <NavLink
-              to="/admin/login"
+              to="/admin-login"
               className="text-blue-500 font-medium"
               onClick={() => setOpen(false)}
             >

@@ -34,7 +34,7 @@ export default function ProjectDetails() {
           description:
             "A real-time collaborative whiteboard for drawing, studying, screen sharing, and synchronized learning.",
           tech:[ "React.js" , "express", "Node", "mopngoDB", "TailwindCSS", "Socket.io", "Youutube API"],
-            github: "#",
+            github: "https://github.com/Rakesh250305/drawno-frontend.git",
           live: "https://drawno-frontend.vercel.app/",
         },
     {

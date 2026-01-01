@@ -30,7 +30,7 @@ const Projects = () => {
       title: "Drawno: Realtime Collaborative whiteboard",
       description:
         "A real-time collaborative whiteboard for drawing, studying, screen sharing, and synchronized learning.",
-      github: "#",
+      github: "https://github.com/Rakesh250305/drawno-frontend.git",
       demo: "https://drawno-frontend.vercel.app/",
       image: drawno,
     },

@@ -1,69 +1,3 @@
-// import { useState } from "react";
-// import { useNavigate } from "react-router-dom";
-
-// export default function AdminLogin() {
-//   const navigate = useNavigate();
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-//   const [error, setError] = useState("");
-
-//   const handleLogin = (e) => {
-//     e.preventDefault();
-
-//     // TEMP AUTH (replace with backend later)
-//     if (email === "admin@portfolio.com" && password === "admin123") {
-//       localStorage.setItem("adminAuth", "true");
-//       navigate("/admin/dashboard");
-//     } else {
-//       setError("Invalid admin credentials");
-//     }
-//   };
-
-//   return (
-//     <div className="min-h-screen flex items-center justify-center bg-gray-950 text-white px-4">
-//       <div className="w-full max-w-md bg-gray-900 border border-gray-800 rounded-xl p-8">
-//         <h2 className="text-2xl font-bold text-center">Admin Login</h2>
-//         <p className="text-gray-400 text-center mt-2">
-//           Restricted access
-//         </p>
-
-//         {error && (
-//           <p className="mt-4 text-red-500 text-sm text-center">{error}</p>
-//         )}
-
-//         <form onSubmit={handleLogin} className="mt-6 space-y-4">
-//           <input
-//             type="email"
-//             placeholder="Admin Email"
-//             value={email}
-//             onChange={(e) => setEmail(e.target.value)}
-//             className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500"
-//             required
-//           />
-
-//           <input
-//             type="password"
-//             placeholder="Password"
-//             value={password}
-//             onChange={(e) => setPassword(e.target.value)}
-//             className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500"
-//             required
-//           />
-
-//           <button
-//             type="submit"
-//             className="w-full py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition"
-//           >
-//             Login
-//           </button>
-//         </form>
-//       </div>
-//     </div>
-//   );
-// }
-
-
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -90,10 +24,9 @@ export default function AdminLogin() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login", // backend URL
+        "http://localhost:5000/api/auth/login",
         formData
       );
-
       // Save JWT token
       localStorage.setItem("adminToken", res.data.token);
 

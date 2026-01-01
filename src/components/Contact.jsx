@@ -1,6 +1,39 @@
 import { FaEnvelope, FaGithub, FaLinkedin } from "react-icons/fa";
+import { useState } from "react";
+import axios from "axios";
 
 export default function Contact() {
+  const [form, setForm] = useState({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState("");
+  const [error, setError] = useState("");
+
+   const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    setSuccess("");
+
+    try {
+      await axios.post("http://localhost:5000/contact/submit", form);
+      setSuccess("Message sent successfully!");
+      setForm({ name: "", email: "", message: "" });
+    } catch (err) {
+      console.error(err);
+      setError("Failed to send message. Try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section id="contact" className="py-20 bg-black text-white">
       <div className="max-w-5xl mx-auto px-6 grid md:grid-cols-2 gap-12">
@@ -57,13 +90,16 @@ export default function Contact() {
         {/* RIGHT: Contact Form */}
         <form
           className="bg-gray-950 border border-white/10 rounded-xl p-6 space-y-4"
-          onSubmit={(e) => e.preventDefault()}
+          onSubmit={handleSubmit}
         >
           <h3 className="text-lg font-medium text-white">
             Send a Message
           </h3>
 
           <input
+          name="name"
+          value={form.name}
+          onChange={handleChange}
             type="text"
             placeholder="Your Name"
             className="w-full px-4 py-2 text-sm bg-black border border-white/10 rounded-md focus:outline-none focus:border-blue-400"
@@ -72,23 +108,37 @@ export default function Contact() {
 
           <input
             type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
             placeholder="Your Email"
             className="w-full px-4 py-2 text-sm bg-black border border-white/10 rounded-md focus:outline-none focus:border-blue-400"
             required
           />
 
           <textarea
+          name="message"
             rows="4"
+            value={form.value}
+            onChange={handleChange}
             placeholder="Your Message"
             className="w-full px-4 py-2 text-sm bg-black border border-white/10 rounded-md focus:outline-none focus:border-blue-400"
             required
           />
 
+          {success && (
+            <p className="text-green-400 text-sm">{success}</p>
+          )}
+          {error && (
+            <p className="text-red-400 text-sm">{error}</p>
+          )}
+
           <button
             type="submit"
+            disabled={loading}
             className="w-full mt-2 py-2 bg-blue-500 text-black font-medium rounded-md hover:bg-blue-400 transition"
           >
-            Send Message
+            {loading ? "sending" : "Send Message"}
           </button>
         </form>
       </div>

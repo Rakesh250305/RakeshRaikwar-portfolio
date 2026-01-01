@@ -1,63 +1,42 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const [stats, setStats] = useState({
+    projects: 0,
+    experience: 0,
+    education: 0,
+    messages: 0,
+  });
 
-  const logout = () => {
-    localStorage.removeItem("adminAuth");
-    navigate("/admin/login");
-  };
+  const token = localStorage.getItem("adminToken");
+
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/admin/stats", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then((res) => setStats(res.data))
+      .catch(() => navigate("/admin/login"));
+  }, []);
+
 
   return (
     <div className="min-h-screen flex bg-gray-950 text-white">
-      
-      {/* SIDEBAR */}
-      <aside className="w-64 bg-gray-900 border-r border-gray-800 p-6 hidden md:block">
-        <h2 className="text-xl font-bold text-blue-500">Admin Panel</h2>
-
-        <nav className="mt-8 space-y-4">
-          <button className="block text-left w-full text-gray-300 hover:text-white">
-            Dashboard
-          </button>
-          <button className="block text-left w-full text-gray-300 hover:text-white">
-            Projects
-          </button>
-          <button className="block text-left w-full text-gray-300 hover:text-white">
-            Skills
-          </button>
-          <button className="block text-left w-full text-gray-300 hover:text-white">
-            Messages
-          </button>
-        </nav>
-
-        <button
-          onClick={logout}
-          className="mt-10 text-red-400 hover:text-red-500"
-        >
-          Logout
-        </button>
-      </aside>
-
-      {/* MAIN CONTENT */}
-      <main className="flex-1 p-8">
+      {/* MAIN */}
+      <main className="flex-1 p-8 mt-14">
         <h1 className="text-3xl font-bold">Dashboard</h1>
 
         {/* STATS */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-400">Projects</p>
-            <h3 className="text-3xl font-bold mt-2">4</h3>
-          </div>
-
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-400">Skills</p>
-            <h3 className="text-3xl font-bold mt-2">10</h3>
-          </div>
-
-          <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
-            <p className="text-gray-400">Messages</p>
-            <h3 className="text-3xl font-bold mt-2">3</h3>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+          <StatCard title="Projects" value={stats.projects} />
+          <StatCard title="Experience" value={stats.experience} />
+          <StatCard title="Education" value={stats.education} />
+          <StatCard title="Messages" value={stats.messages} />
         </div>
 
         {/* WELCOME */}
@@ -68,6 +47,15 @@ export default function Dashboard() {
           </p>
         </div>
       </main>
+    </div>
+  );
+}
+
+function StatCard({ title, value }) {
+  return (
+    <div className="bg-gray-900 border border-gray-800 rounded-xl p-6">
+      <p className="text-gray-400">{title}</p>
+      <h3 className="text-3xl font-bold mt-2">{value}</h3>
     </div>
   );
 }
