@@ -6,6 +6,7 @@ import { upload } from "@vercel/blob/client";
 export default function CreateProject() {
   const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
@@ -14,30 +15,49 @@ export default function CreateProject() {
     live: "",
   });
 
-  const [loading, setLoading] = useState(false);
   const [image, setImage] = useState(null);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  // Change on inputs
-  const handleChange = (e) =>{
-       setFormData({ ...formData, [e.target.name]: e.target.value });
-  }
+  // ---------- input change ----------
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
-  const handleImageChange = (e)=>{
-    setImage(e.target.files[0]);
-  }
+  // ---------- image change ----------
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
 
-  // -------- submit --------
+    // Validate type
+    if (!file.type.startsWith("image/")) {
+      alert("Only image files are allowed");
+      return;
+    }
+
+    // Validate size (5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Image must be less than 5MB");
+      return;
+    }
+
+    setImage(file);
+    setPreview(URL.createObjectURL(file));
+  };
+
+  // ---------- submit ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(!image){
+    if (!image) {
       alert("Image is required");
       return;
     }
 
     try {
       setLoading(true);
-      // uploading image to vercel
+
+      // Upload image to Vercel Blob
       const blob = await upload(
         `projects/${Date.now()}-${image.name}`,
         image,
@@ -47,10 +67,9 @@ export default function CreateProject() {
         }
       );
 
-      // Send JSON to backend
-      const res = await axios.post(
+      // Send data to backend
+      await axios.post(
         `${apiUrl}/admin/projects/create`,
-        // "https://rakeshraikwar-portfolio-backend.vercel.app/admin/projects/create",
         {
           title: formData.title,
           description: formData.description,
@@ -68,11 +87,6 @@ export default function CreateProject() {
 
       alert("Project Created Successfully!");
       navigate("/admin/project/list");
-
-      if (res.data.success){
-        alert("Project Created Successfully!");
-        navigate("/admin/project/list");
-      }
     } catch (err) {
       console.error(err);
       alert("Error creating project");
@@ -83,8 +97,7 @@ export default function CreateProject() {
 
   return (
     <div className="min-h-screen flex bg-gray-950 text-white">
-
-      <main className="flex-1 p-8 mt-14">
+      <main className="flex-1 p-8 mt-14 max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold mb-6">Create Project</h1>
 
         <form
@@ -100,6 +113,7 @@ export default function CreateProject() {
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
             required
           />
+
           <textarea
             name="description"
             placeholder="Project Description"
@@ -108,6 +122,7 @@ export default function CreateProject() {
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
             required
           />
+
           <input
             type="text"
             name="tech"
@@ -116,6 +131,7 @@ export default function CreateProject() {
             onChange={handleChange}
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
+
           <input
             type="url"
             name="github"
@@ -124,6 +140,7 @@ export default function CreateProject() {
             onChange={handleChange}
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
+
           <input
             type="url"
             name="live"
@@ -132,11 +149,37 @@ export default function CreateProject() {
             onChange={handleChange}
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
-          <input
-            type="file"
-            onChange={handleImageChange}
-            className="w-full text-gray-400"
-          />
+
+          {/* Image Upload */}
+          <div className="space-y-2">
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImageChange}
+              className="w-full text-gray-400"
+            />
+
+            {/* Preview */}
+            {preview && (
+              <div className="relative w-full max-w-sm">
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="rounded-lg border border-gray-700 object-cover"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setImage(null);
+                    setPreview(null);
+                  }}
+                  className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 text-sm rounded"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
 
           <button
             type="submit"
