@@ -63,7 +63,7 @@ export default function CreateProject() {
         image,
         {
           access: "public",
-          handleUploadUrl: "/api/blob/upload",
+          handleUploadUrl: `${apiUrl}/api/blob/upload`,
         }
       );
 
