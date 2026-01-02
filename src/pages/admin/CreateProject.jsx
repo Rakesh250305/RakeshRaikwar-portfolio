@@ -25,7 +25,7 @@ export default function CreateProject() {
     if (name === "image") {
       setFormData({ ...formData, image: files[0] });
       setPreview(URL.createObjectURL(files[0]));
-}else setFormData({ ...formData, [name]: value });
+    } else setFormData({ ...formData, [name]: value });
   };
 
   // ---------- submit ----------
@@ -45,21 +45,18 @@ export default function CreateProject() {
       fd.append("description", formData.description);
       fd.append("githubUrl", formData.github);
       fd.append("liveUrl", formData.live);
-      fd.append("tech",JSON.stringify(formData.tech));
-      if(formData.image) fd.append("image",formData.image);
+      fd.append("tech", JSON.stringify(formData.tech));
+      if (formData.image) fd.append("image", formData.image);
 
-      const res = await axios.post(
-        `${apiUrl}/admin/projects/create`,
-        fd,{
-          headers :{
-            Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
-            // "Content-Type": "multipart/form-data",
-          },
-          withCredentials:true,
-        }
-      );
+      const res = await axios.post(`${apiUrl}/admin/projects/create`, fd, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          // "Content-Type": "multipart/form-data",
+        },
+        withCredentials: true,
+      });
 
-      if(res.data.success){
+      if (res.data.success) {
         alert("Project Created Successfully!");
         navigate("/admin/project/list");
       }
@@ -98,19 +95,44 @@ export default function CreateProject() {
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
             required
           />
-            <div className="mb-3">
-          <label className="form-label">Technology</label>
-          <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
-            <input
-              type="text"
-              className="form-control"
-              value={newTech}
-              onChange={(e) => setNewTech(e.target.value)}
-              placeholder="Enter a Technology"
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
+          <div className="mb-3">
+            <label className="form-label">Technology</label>
+            <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+              <input
+                type="text"
+                className="form-control"
+                value={newTech}
+                onChange={(e) => setNewTech(e.target.value)}
+                placeholder="Enter a Technology"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
 
+                    const tech = newTech.trim().toLowerCase();
+                    if (!tech) return;
+
+                    if (formData.tech.includes(tech)) {
+                      alert("Duplicate tags are not allowed");
+                      setNewTech("");
+                      return;
+                    }
+
+                    if (newTech.trim() === "") return;
+
+                    setFormData((prev) => ({
+                      ...prev,
+                      tech: [...prev.tech, newTech.trim()],
+                    }));
+
+                    setNewTech("");
+                  }
+                }}
+              />
+              <button
+                type="button"
+                className="btn primary-btn"
+                onClick={(e) => {
+                  e.preventDefault();
                   const tech = newTech.trim().toLowerCase();
                   if (!tech) return;
 
@@ -119,71 +141,50 @@ export default function CreateProject() {
                     setNewTech("");
                     return;
                   }
-
                   if (newTech.trim() === "") return;
-
                   setFormData((prev) => ({
                     ...prev,
                     tech: [...prev.tech, newTech.trim()],
                   }));
-
                   setNewTech("");
-                }
-              }}
-            />
-            <button
-              type="button"
-              className="btn primary-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                const tech = newTech.trim().toLowerCase();
-                if (!tech) return;
-
-                if (formData.tech.includes(tech)) {
-                  alert("Duplicate tags are not allowed");
-                  setNewTech("");
-                  return;
-                }
-                if (newTech.trim() === "") return;
-                setFormData((prev) => ({
-                  ...prev,
-                  tech: [...prev.tech, newTech.trim()],
-                }));
-                setNewTech("");
-              }}
-            >
-              +
-            </button>
-          </div>
-
-          {Array.isArray(formData.tech) &&
-            formData.tech.map((t, idx) => (
-              <div
-                key={idx}
-                style={{
-                  display: "inline-block",
-                  padding: "5px 10px",
-                  background: "#e0e0e0",
-                  margin: "3px",
-                  borderRadius: "5px",
                 }}
               >
-                {t}{" "}
-                <span
-                  style={{ cursor: "pointer", color: "red", marginLeft: "5px" }}
-                  onClick={() =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      tech: prev.tech.filter((_, i) => i !== idx),
-                    }))
-                  }
+                +
+              </button>
+            </div>
+
+            {Array.isArray(formData.tech) &&
+              formData.tech.map((t, idx) => (
+                <div
+                  key={idx}
+                  style={{
+                    display: "inline-block",
+                    padding: "5px 10px",
+                    background: "#e0e0e0",
+                    margin: "3px",
+                    borderRadius: "5px",
+                  }}
                 >
-                  &times;
-                </span>
-              </div>
-            ))}
-        </div>
-{/* 
+                  {t}{" "}
+                  <span
+                    style={{
+                      cursor: "pointer",
+                      color: "red",
+                      marginLeft: "5px",
+                    }}
+                    onClick={() =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        tech: prev.tech.filter((_, i) => i !== idx),
+                      }))
+                    }
+                  >
+                    &times;
+                  </span>
+                </div>
+              ))}
+          </div>
+          {/* 
           <input
             type="text"
             name="tech"
