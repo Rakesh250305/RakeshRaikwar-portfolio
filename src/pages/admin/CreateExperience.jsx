@@ -110,23 +110,23 @@ export default function CreateExperience() {
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
           <div className="mb-3">
-            <label className="form-label">Technology</label>
+            <label className="form-label">Highlights</label>
             <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
               <input
                 type="text"
                 className="form-control"
                 value={newHighlight}
                 onChange={(e) => setNewHighlight(e.target.value)}
-                placeholder="Enter a Technology"
+                placeholder="Enter Highlights"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
 
-                    const tech = newHighlight.trim().toLowerCase();
-                    if (!tech) return;
+                    const highlight = newHighlight.trim().toLowerCase();
+                    if (!highlight) return;
 
-                    if (formData.tech.includes(tech)) {
-                      alert("Duplicate tags are not allowed");
+                    if (formData.highlights.includes(highlight)) {
+                      alert("Duplicate highlights are not allowed");
                       setNewHighlight("");
                       return;
                     }
@@ -135,7 +135,7 @@ export default function CreateExperience() {
 
                     setFormData((prev) => ({
                       ...prev,
-                      tech: [...prev.tech, newHighlight.trim()],
+                      highlights: [...prev.highlights, newHighlight.trim()],
                     }));
 
                     setNewHighlight("");
@@ -145,22 +145,26 @@ export default function CreateExperience() {
               <button
                 type="button"
                 className="btn primary-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const tech = newHighlight.trim().toLowerCase();
-                  if (!tech) return;
+                onKeyDown={(e) => {
+                    e.preventDefault();
 
-                  if (formData.tech.includes(tech)) {
-                    alert("Duplicate tags are not allowed");
+                    const highlight = newHighlight.trim().toLowerCase();
+                    if (!highlight) return;
+
+                    if (formData.highlights.includes(highlight)) {
+                      alert("Duplicate highlights are not allowed");
+                      setNewHighlight("");
+                      return;
+                    }
+
+                    if (newHighlight.trim() === "") return;
+
+                    setFormData((prev) => ({
+                      ...prev,
+                      highlights: [...prev.highlights, newHighlight.trim()],
+                    }));
+
                     setNewHighlight("");
-                    return;
-                  }
-                  if (newHighlight.trim() === "") return;
-                  setFormData((prev) => ({
-                    ...prev,
-                    tech: [...prev.tech, newHighlight.trim()],
-                  }));
-                  setNewHighlight("");
                 }}
               >
                 +
@@ -168,7 +172,7 @@ export default function CreateExperience() {
             </div>
 
             {Array.isArray(formData.tech) &&
-              formData.tech.map((t, idx) => (
+              formData.tech.map((h, idx) => (
                 <div
                   key={idx}
                   style={{
@@ -179,7 +183,7 @@ export default function CreateExperience() {
                     borderRadius: "5px",
                   }}
                 >
-                  {t}{" "}
+                  {h}{" "}
                   <span
                     style={{
                       cursor: "pointer",
