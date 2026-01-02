@@ -1,7 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { upload } from "@vercel/blob/client";
 
 export default function CreateProject() {
   const apiUrl = import.meta.env.VITE_API_URL;
@@ -10,46 +9,28 @@ export default function CreateProject() {
   const [formData, setFormData] = useState({
     title: "",
     description: "",
-    tech: "",
+    tech: [],
     github: "",
     live: "",
+    image: null,
   });
 
-  const [image, setImage] = useState(null);
+  const [newTech, setNewTech] = useState("");
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
 
   // ---------- input change ----------
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  // ---------- image change ----------
-  const handleImageChange = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    // Validate type
-    if (!file.type.startsWith("image/")) {
-      alert("Only image files are allowed");
-      return;
-    }
-
-    // Validate size (5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      alert("Image must be less than 5MB");
-      return;
-    }
-
-    setImage(file);
-    setPreview(URL.createObjectURL(file));
+    const { name, value, files } = e.target;
+    if (name === "image") setFormData({ ...formData, image: files[0] });
+    else setFormData({ ...formData, [name]: value });
   };
 
   // ---------- submit ----------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!image) {
+    if (!formData.image) {
       alert("Image is required");
       return;
     }
@@ -57,36 +38,28 @@ export default function CreateProject() {
     try {
       setLoading(true);
 
-      // Upload image to Vercel Blob
-      const blob = await upload(
-        `projects/${Date.now()}-${image.name}`,
-        image,
-        {
-          access: "public",
-          handleUploadUrl: `${apiUrl}/api/blob/upload`,
-        }
-      );
+      const fd = new formData();
+      fd.append("title", formData.title);
+      fd.append("description", formData.description);
+      fd.append("github", formData.github);
+      fd.append("live", formData.live);
+      fd.append("tech",JSON.stringify(formData.tech));
+      if(formData.image) fd.append("image",formData.image);
 
-      // Send data to backend
-      await axios.post(
+      const res = await axios.post(
         `${apiUrl}/admin/projects/create`,
-        {
-          title: formData.title,
-          description: formData.description,
-          tech: formData.tech,
-          githubUrl: formData.github,
-          liveUrl: formData.live,
-          imageUrl: blob.url,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+        fd,{
+          headers :{
+            Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
+            "Content-Type": "multipart/form-data",
           },
         }
       );
 
-      alert("Project Created Successfully!");
-      navigate("/admin/project/list");
+      if(res.data.success){
+        alert("Project Created Successfully!");
+        navigate("/admin/project/list");
+      }
     } catch (err) {
       console.error(err);
       alert("Error creating project");
@@ -122,7 +95,92 @@ export default function CreateProject() {
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
             required
           />
+            <div className="mb-3">
+          <label className="form-label">Technology</label>
+          <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+            <input
+              type="text"
+              className="form-control"
+              value={newTech}
+              onChange={(e) => setNewTech(e.target.value)}
+              placeholder="Enter a Technology"
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
 
+                  const tech = newTech.trim().toLowerCase();
+                  if (!tech) return;
+
+                  if (formData.tech.includes(tech)) {
+                    alert("Duplicate tags are not allowed");
+                    setNewTech("");
+                    return;
+                  }
+
+                  if (newTech.trim() === "") return;
+
+                  setFormData((prev) => ({
+                    ...prev,
+                    tech: [...prev.tech, newTech.trim()],
+                  }));
+
+                  setNewTech("");
+                }
+              }}
+            />
+            <button
+              type="button"
+              className="btn primary-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                const tech = newTech.trim().toLowerCase();
+                if (!tech) return;
+
+                if (formData.tech.includes(tech)) {
+                  alert("Duplicate tags are not allowed");
+                  setNewTech("");
+                  return;
+                }
+                if (newTech.trim() === "") return;
+                setFormData((prev) => ({
+                  ...prev,
+                  tech: [...prev.tag, newTech.trim()],
+                }));
+                setNewTech("");
+              }}
+            >
+              +
+            </button>
+          </div>
+
+          {Array.isArray(formData.tech) &&
+            formData.tech.map((t, idx) => (
+              <div
+                key={idx}
+                style={{
+                  display: "inline-block",
+                  padding: "5px 10px",
+                  background: "#e0e0e0",
+                  margin: "3px",
+                  borderRadius: "5px",
+                }}
+              >
+                {t}{" "}
+                <span
+                  style={{ cursor: "pointer", color: "red", marginLeft: "5px" }}
+                  onClick={() =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      tech: prev.tech.filter((_, i) => i !== idx),
+                    }))
+                  }
+                >
+                  &times;
+                </span>
+              </div>
+            ))}
+        </div>
+{/* 
           <input
             type="text"
             name="tech"
@@ -130,7 +188,7 @@ export default function CreateProject() {
             value={formData.tech}
             onChange={handleChange}
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
-          />
+          /> */}
 
           <input
             type="url"
@@ -154,8 +212,10 @@ export default function CreateProject() {
           <div className="space-y-2">
             <input
               type="file"
+              name="image"
               accept="image/*"
-              onChange={handleImageChange}
+              id="image"
+              onChange={handleChange}
               className="w-full text-gray-400"
             />
 
@@ -170,7 +230,6 @@ export default function CreateProject() {
                 <button
                   type="button"
                   onClick={() => {
-                    setImage(null);
                     setPreview(null);
                   }}
                   className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 text-sm rounded"
