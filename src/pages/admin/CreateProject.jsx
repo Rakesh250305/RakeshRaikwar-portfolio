@@ -22,8 +22,10 @@ export default function CreateProject() {
   // ---------- input change ----------
   const handleChange = (e) => {
     const { name, value, files } = e.target;
-    if (name === "image") setFormData({ ...formData, image: files[0] });
-    else setFormData({ ...formData, [name]: value });
+    if (name === "image") {
+      setFormData({ ...formData, image: files[0] });
+      setPreview(URL.createObjectURL(files[0]));
+}else setFormData({ ...formData, [name]: value });
   };
 
   // ---------- submit ----------
@@ -38,11 +40,11 @@ export default function CreateProject() {
     try {
       setLoading(true);
 
-      const fd = new formData();
+      const fd = new FormData();
       fd.append("title", formData.title);
       fd.append("description", formData.description);
-      fd.append("github", formData.github);
-      fd.append("live", formData.live);
+      fd.append("githubUrl", formData.github);
+      fd.append("liveUrl", formData.live);
       fd.append("tech",JSON.stringify(formData.tech));
       if(formData.image) fd.append("image",formData.image);
 
@@ -51,8 +53,9 @@ export default function CreateProject() {
         fd,{
           headers :{
             Authorization: `Bearer ${localStorage.getItem('adminToken')}`,
-            "Content-Type": "multipart/form-data",
+            // "Content-Type": "multipart/form-data",
           },
+          withCredentials:true,
         }
       );
 
@@ -144,7 +147,7 @@ export default function CreateProject() {
                 if (newTech.trim() === "") return;
                 setFormData((prev) => ({
                   ...prev,
-                  tech: [...prev.tag, newTech.trim()],
+                  tech: [...prev.tech, newTech.trim()],
                 }));
                 setNewTech("");
               }}
