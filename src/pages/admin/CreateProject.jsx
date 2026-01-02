@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { upload } from "@vercel/blob/client";
 
 export default function CreateProject() {
   const navigate = useNavigate();
@@ -11,39 +12,65 @@ export default function CreateProject() {
     github: "",
     live: "",
   });
-  const [image, setImage] = useState(null);
+
   const [loading, setLoading] = useState(false);
+  const [image, setImage] = useState(null);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+  // Change on inputs
+  const handleChange = (e) =>{
+       setFormData({ ...formData, [e.target.name]: e.target.value });
+  }
 
-  const handleImageChange = (e) => {
+  const handleImageChange = (e)=>{
     setImage(e.target.files[0]);
-  };
+  }
 
+  // -------- submit --------
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
 
-    const data = new FormData();
-    data.append("title", formData.title);
-    data.append("description", formData.description);
-    data.append("tech", formData.tech); // comma-separated string
-    data.append("github", formData.github);
-    data.append("live", formData.live);
-    // if (image) data.append("image", image);
+    if(!image){
+      alert("Image is required");
+      return;
+    }
 
     try {
-      await axios.post("http://localhost:5000/admin/projects/create", data, {
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-            "Content-Type": "application/json",
-          //   "Content-Type": "multipart/form-data",
+      setLoading(true);
+      // uploading image to vercel
+      const blob = await upload(
+        `projects/${Date.now()}-${image.name}`,
+        image,
+        {
+          access: "public",
+          handleUploadUrl: "/api/blob/upload",
+        }
+      );
 
+      // Send JSON to backend
+      const res = await axios.post(
+        "https://rakeshraikwar-portfolio-backend.vercel.app/admin/projects/create",
+        {
+          title: formData.title,
+          description: formData.description,
+          tech: formData.tech,
+          githubUrl: formData.github,
+          liveUrl: formData.live,
+          imageUrl: blob.url,
         },
-      });
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
+          },
+        }
+      );
+
+      alert("Project Created Successfully!");
       navigate("/admin/project/list");
+
+      if (res.data.success){
+        alert("Project Created Successfully!");
+        navigate("/admin/project/list");
+      }
     } catch (err) {
       console.error(err);
       alert("Error creating project");
@@ -103,11 +130,11 @@ export default function CreateProject() {
             onChange={handleChange}
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
-          {/* <input
+          <input
             type="file"
             onChange={handleImageChange}
             className="w-full text-gray-400"
-          /> */}
+          />
 
           <button
             type="submit"

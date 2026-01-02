@@ -28,8 +28,8 @@ export default function CreateExperience() {
       await axios.post("http://localhost:5000/admin/experience/create", data, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
-          "Content-Type": "application/json",
-        //   "Content-Type": "multipart/form-data",
+          // "Content-Type": "application/json",
+          "Content-Type": "multipart/form-data",
         },
       });
       navigate("/admin/experience/list");
@@ -51,7 +51,7 @@ export default function CreateExperience() {
           <input type="text" name="duration" placeholder="Duration" onChange={handleChange} required className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"/>
           <textarea name="description" placeholder="Description" onChange={handleChange} className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"/>
           <textarea name="highlights" placeholder="Highlights" onChange={handleChange} className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"/>
-          {/* <input type="file" onChange={handleImageChange} className="w-full text-gray-400"/> */}
+          <input type="file" onChange={handleImageChange} className="w-full text-gray-400"/>
           <button type="submit" disabled={loading} className="w-full py-2 bg-blue-600 hover:bg-blue-500 rounded-md">{loading ? "Creating..." : "Create Experience"}</button>
         </form>
       </main>
