@@ -79,6 +79,7 @@ export default function CreateExperience() {
           className="bg-gray-900 border border-gray-800 rounded-xl p-6 space-y-4"
           onSubmit={handleSubmit}
         >
+          <label className="ml-5 text-gray-300">Role</label>
           <input
             type="text"
             name="role"
@@ -87,6 +88,8 @@ export default function CreateExperience() {
             required
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
+
+          <label className="ml-5 text-gray-300">Company</label>
           <input
             type="text"
             name="company"
@@ -95,6 +98,8 @@ export default function CreateExperience() {
             required
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
+
+          <label className="ml-5 text-gray-300">Duration</label>
           <input
             type="text"
             name="duration"
@@ -103,18 +108,21 @@ export default function CreateExperience() {
             required
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
+
+          <label className="ml-5 text-gray-300">Description</label>
           <textarea
             name="description"
             placeholder="Description"
             onChange={handleChange}
             className="w-full px-4 py-2 bg-black border border-white/10 rounded-md"
           />
-          <div className="mb-3">
-            <label className="form-label">Highlights</label>
-            <div style={{ display: "flex", gap: "10px", marginBottom: "10px" }}>
+          
+          <div className="w-full">
+            <label className="ml-5 text-gray-300">Highlights</label>
+            <div >
               <input
                 type="text"
-                className="form-control"
+                className="w-[90vw] px-4 py-2 bg-black border border-white/10 rounded-md"
                 value={newHighlight}
                 onChange={(e) => setNewHighlight(e.target.value)}
                 placeholder="Enter Highlights"
@@ -122,14 +130,18 @@ export default function CreateExperience() {
                   if (e.key === "Enter") {
                     e.preventDefault();
 
-                    const highlight = newHighlight.trim().toLowerCase();
-                    if (!highlight) return;
+                    const normalized = newHighlight.trim().toLowerCase();
 
-                    if (formData.highlights.includes(highlight)) {
-                      alert("Duplicate highlights are not allowed");
-                      setNewHighlight("");
-                      return;
-                    }
+if (
+  formData.highlights.some(
+    (h) => h.toLowerCase() === normalized
+  )
+) {
+  alert("Duplicate highlights are not allowed");
+  setNewHighlight("");
+  return;
+}
+
 
                     if (newHighlight.trim() === "") return;
 
@@ -144,18 +156,22 @@ export default function CreateExperience() {
               />
               <button
                 type="button"
-                className="btn primary-btn"
-                onKeyDown={(e) => {
+                className="rounded-lg text-black text-3xl bg-slate-200 ml-2 border px-2 py-1 btn primary-btn"
+                onClick={(e) => {
                     e.preventDefault();
 
-                    const highlight = newHighlight.trim().toLowerCase();
-                    if (!highlight) return;
+                   const normalized = newHighlight.trim().toLowerCase();
 
-                    if (formData.highlights.includes(highlight)) {
-                      alert("Duplicate highlights are not allowed");
-                      setNewHighlight("");
-                      return;
-                    }
+if (
+  formData.highlights.some(
+    (h) => h.toLowerCase() === normalized
+  )
+) {
+  alert("Duplicate highlights are not allowed");
+  setNewHighlight("");
+  return;
+}
+
 
                     if (newHighlight.trim() === "") return;
 
@@ -171,8 +187,8 @@ export default function CreateExperience() {
               </button>
             </div>
 
-            {Array.isArray(formData.tech) &&
-              formData.tech.map((h, idx) => (
+            {Array.isArray(formData.highlights) &&
+              formData.highlights.map((h, idx) => (
                 <div
                   key={idx}
                   style={{
@@ -193,7 +209,7 @@ export default function CreateExperience() {
                     onClick={() =>
                       setFormData((prev) => ({
                         ...prev,
-                        tech: prev.tech.filter((_, i) => i !== idx),
+                        highlights: prev.highlights.filter((_, i) => i !== idx),
                       }))
                     }
                   >
@@ -202,7 +218,10 @@ export default function CreateExperience() {
                 </div>
               ))}
           </div>
+
+
            <div className="space-y-2">
+          <label className="ml-5 my-2 text-gray-400">Company Logo</label>
             <input
               type="file"
               name="image"
@@ -224,6 +243,7 @@ export default function CreateExperience() {
                   type="button"
                   onClick={() => {
                     setPreview(null);
+                    setFormData((prev) => ({ ...prev, image: null }));
                   }}
                   className="absolute top-2 right-2 bg-black/70 text-white px-2 py-1 text-sm rounded"
                 >
