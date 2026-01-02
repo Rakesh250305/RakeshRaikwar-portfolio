@@ -3,6 +3,7 @@ import axios from "axios";
 import { FaTrash, FaEdit } from "react-icons/fa";
 
 export default function ProjectList() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [projects, setProjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -10,7 +11,10 @@ export default function ProjectList() {
   useEffect(() => {
     const fetchProjects = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/admin/projects", {
+        const res = await axios.get(
+          `${apiUrl}/admin/projects`
+          // "http://localhost:5000/admin/projects"
+          , {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           },

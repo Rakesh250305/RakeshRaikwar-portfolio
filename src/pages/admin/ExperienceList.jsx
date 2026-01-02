@@ -3,13 +3,17 @@ import axios from "axios";
 import { FaTrash, FaEdit } from "react-icons/fa";
 
 export default function ExperienceList() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [experiences, setExperiences] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchExperiences = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/admin/experience", {
+        const res = await axios.get(
+          `${apiUrl}/admin/experience`
+          // "http://localhost:5000/admin/experience"
+          , {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           },

@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateEducation() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     degree: "",
@@ -20,7 +21,10 @@ export default function CreateEducation() {
     e.preventDefault();
     setLoading(true);
     try {
-      await axios.post("http://localhost:5000/admin/education/create", formData, {
+      await axios.post(
+        `${apiUrl}/admin/education/create`
+        // "http://localhost:5000/admin/education/create"
+        , formData, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
         },

@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function AdminLogin() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -24,7 +25,8 @@ export default function AdminLogin() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/auth/login",
+        `${apiUrl}/api/auth/login`,
+        // "http://localhost:5000/api/auth/login",
         formData
       );
       // Save JWT token

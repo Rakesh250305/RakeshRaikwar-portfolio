@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function Dashboard() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [stats, setStats] = useState({
     projects: 0,
@@ -15,14 +16,17 @@ export default function Dashboard() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/admin/stats", {
+      .get(
+        `${apiUrl}/admin/stats`,
+        "http://localhost:5000/admin/stats",
+         {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       })
       .then((res) => setStats(res.data))
       .catch(() => navigate("/admin/login"));
-  }, []);
+  }, [apiUrl, navigate, token]);
 
 
   return (

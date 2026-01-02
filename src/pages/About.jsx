@@ -1,6 +1,5 @@
 import Education from "../components/Education.jsx";
 import Experience from "../components/Experience.jsx";
-import { motion } from "framer-motion";
 import { FaBriefcase } from "react-icons/fa";
 
 

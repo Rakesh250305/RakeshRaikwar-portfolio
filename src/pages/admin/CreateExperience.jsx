@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
 export default function CreateExperience() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     role: "",
@@ -25,7 +26,10 @@ export default function CreateExperience() {
     if (image) data.append("image", image);
 
     try {
-      await axios.post("http://localhost:5000/admin/experience/create", data, {
+      await axios.post(
+        `${apiUrl}/admin/experience/create`
+        // "http://localhost:5000/admin/experience/create"
+        , data, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           // "Content-Type": "application/json",

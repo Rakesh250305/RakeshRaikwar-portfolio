@@ -3,13 +3,17 @@ import axios from "axios";
 import { FaTrash, FaEdit } from "react-icons/fa";
 
 export default function EducationList() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [educations, setEducations] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchEducations = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/admin/education", {
+        const res = await axios.get(
+          `${apiUrl}/admin/education`
+          // "http://localhost:5000/admin/education"
+          , {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           },

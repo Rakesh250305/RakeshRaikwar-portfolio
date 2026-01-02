@@ -2,13 +2,17 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 export default function ContactList() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchContacts = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/contact", {
+        const res = await axios.get(
+          `${apiUrl}/contact`
+          // "http://localhost:5000/contact"
+          , {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("adminToken")}`,
           },

@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { upload } from "@vercel/blob/client";
 
 export default function CreateProject() {
+  const apiUrl = import.meta.env.VITE_API_URL;
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     title: "",
@@ -48,7 +49,8 @@ export default function CreateProject() {
 
       // Send JSON to backend
       const res = await axios.post(
-        "https://rakeshraikwar-portfolio-backend.vercel.app/admin/projects/create",
+        `${apiUrl}/admin/projects/create`,
+        // "https://rakeshraikwar-portfolio-backend.vercel.app/admin/projects/create",
         {
           title: formData.title,
           description: formData.description,
